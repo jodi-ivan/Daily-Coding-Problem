@@ -1,3 +1,7 @@
 This problem was asked by Google.
 
 A coin was flipped 1000 times, and 550 times it showed up heads. Do you think the coin is biased? Why or why not?
+
+- no, because 50% is in the large scale lens, having 1000 times does not mean it will give 550 time head.
+- each flip is independent and does not have any connection to the previous flip
+- t

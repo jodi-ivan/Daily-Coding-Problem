@@ -7,3 +7,42 @@ column_name	type
 user_id	integer
 event_id	string ("sign-in", "like", "comment")
 timestamp	datetime
+
+
+
+MY solution: 
+-- Select user_id, month_date, count(*) from table group by user_id, CONCAT(YEAR(datetime), "-", MONTH(date_time))
+WITH monthly_active_users AS (
+    SELECT 
+        user_id,
+        CONCAT(YEAR(timestamp), "-", MONTH(timestamp)) AS month_date
+    FROM 
+        user_actions
+    GROUP BY 
+        user_id, 
+        month_date
+),
+user_retention AS (
+    SELECT 
+        mu1.month_date AS month_active,
+        COUNT(DISTINCT mu1.user_id) AS retained_count,
+        COUNT(DISTINCT mu2.user_id) AS total_retained
+    FROM 
+        monthly_active_users mu1
+    LEFT JOIN 
+        monthly_active_users mu2 ON mu1.user_id = mu2.user_id 
+                                   AND DATE_FORMAT(mu2.month_date, '%Y-%m') = DATE_FORMAT(DATE_ADD(mu1.month_date, INTERVAL 1 MONTH), '%Y-%m')
+    GROUP BY 
+        mu1.month_date
+)
+
+SELECT 
+    month_active,
+    retained_count,
+    (retained_count / total_retained) * 100 AS retention_rate
+FROM 
+    user_retention
+WHERE 
+    total_retained > 0
+ORDER BY 
+    month_active;
